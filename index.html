@@ -29,6 +29,8 @@
             --flower-growth: 0;
             --moon-glow: rgba(255, 255, 240, 0.1);
             --bg-gradient: linear-gradient(0deg, #03001C 0%, #301E67 50%, #2b013e 100%);
+            --apology-opacity: 0;
+            --apology-scale: 0.8;
         }
 
         html, body {
@@ -75,20 +77,6 @@
             box-shadow: 0 0 40px 15px var(--moon-glow);
             z-index: -1;
             transition: all 1.5s ease;
-        }
-
-        .day-mode .moon {
-            opacity: 0;
-            transform: translateY(-100px);
-        }
-
-        .day-mode .night {
-            opacity: 0.3;
-        }
-
-        .day-mode {
-            --bg-gradient: linear-gradient(0deg, #87CEEB 0%, #98FB98 50%, #FFFFE0 100%);
-            --moon-glow: transparent;
         }
 
         .flowers {
@@ -201,10 +189,6 @@
             transform: translateX(-50%) rotate(315deg) translateY(-2vmin);
         }
 
-        .flower:hover .flower__leaf {
-            transform: translateX(-50%) rotate(var(--rot)) translateY(-2vmin) scale(1.05);
-        }
-
         .flower__center {
             position: absolute;
             left: 50%;
@@ -294,46 +278,6 @@
 
         .flower__light:nth-child(odd) {
             background-color: #ffd966;
-        }
-
-        .flower__light--1 {
-            left: -2vmin;
-            animation-delay: 1s;
-        }
-
-        .flower__light--2 {
-            left: 3vmin;
-            animation-delay: 0.5s;
-        }
-
-        .flower__light--3 {
-            left: -6vmin;
-            animation-delay: 0.3s;
-        }
-
-        .flower__light--4 {
-            left: 6vmin;
-            animation-delay: 0.9s;
-        }
-
-        .flower__light--5 {
-            left: -1vmin;
-            animation-delay: 1.5s;
-        }
-
-        .flower__light--6 {
-            left: -4vmin;
-            animation-delay: 3s;
-        }
-
-        .flower__light--7 {
-            left: 3vmin;
-            animation-delay: 2s;
-        }
-
-        .flower__light--8 {
-            left: -6vmin;
-            animation-delay: 3.5s;
         }
 
         @keyframes light-ans {
@@ -447,6 +391,55 @@
         #poem-text.typing-done::after {
             animation: none;
             opacity: 0;
+        }
+
+        .apology-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: var(--apology-opacity);
+            transform: scale(var(--apology-scale));
+            transition: opacity 1.5s ease, transform 1.5s ease;
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        .apology-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #fff;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8),
+                         0 0 20px rgba(255, 140, 0, 0.6),
+                         0 0 30px rgba(255, 69, 0, 0.4);
+            background: linear-gradient(to right, #ffd700, #ff8c00, #ff4500);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            animation: pulse 3s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.8),
+                             0 0 20px rgba(255, 140, 0, 0.6),
+                             0 0 30px rgba(255, 69, 0, 0.4);
+            }
+            100% {
+                transform: scale(1.05);
+                text-shadow: 0 0 15px rgba(255, 215, 0, 0.9),
+                             0 0 25px rgba(255, 140, 0, 0.7),
+                             0 0 35px rgba(255, 69, 0, 0.5);
+            }
         }
 
         .star {
@@ -588,6 +581,10 @@
                 width: 60px;
                 height: 60px;
             }
+            
+            .apology-text {
+                font-size: 2.8rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -610,6 +607,11 @@
                 right: 5%;
                 width: 40px;
                 height: 40px;
+            }
+            
+            .apology-text {
+                font-size: 2.2rem;
+                padding: 15px;
             }
         }
     </style>
@@ -714,8 +716,11 @@
         <p id="poem-text"></p>
     </div>
     
+    <div class="apology-container">
+        <div class="apology-text">En fin, me disculpo</div>
+    </div>
+    
     <div class="controls">
-        <button class="control-btn" id="toggleMode">Modo Día</button>
         <button class="control-btn" id="replayBtn">Repetir</button>
     </div>
 
@@ -816,7 +821,22 @@
                         const baseHeight = stemHeights[flower.classList[1]];
                         flower.querySelector('.flower__line').style.height = `${baseHeight}vmin`;
                     });
+                    
+                    // Mostrar mensaje de disculpa después de un breve retraso
+                    setTimeout(showApology, 1500);
                 }
+            }
+
+            // Mostrar mensaje de disculpa
+            function showApology() {
+                root.style.setProperty('--apology-opacity', 1);
+                root.style.setProperty('--apology-scale', 1);
+            }
+
+            // Ocultar mensaje de disculpa
+            function hideApology() {
+                root.style.setProperty('--apology-opacity', 0);
+                root.style.setProperty('--apology-scale', 0.8);
             }
 
             // Crear estrellas
@@ -839,18 +859,13 @@
                 poemElement.classList.remove("typing-done");
                 root.style.setProperty('--leaf-growth', 0);
                 root.style.setProperty('--flower-growth', 0);
+                hideApology();
                 
                 document.querySelectorAll('.flower').forEach(flower => {
                     flower.querySelector('.flower__line').style.height = `0vmin`;
                 });
                 
                 setTimeout(typeWriter, 500);
-            });
-
-            document.getElementById('toggleMode').addEventListener('click', () => {
-                document.body.classList.toggle('day-mode');
-                const btn = document.getElementById('toggleMode');
-                btn.textContent = document.body.classList.contains('day-mode') ? 'Modo Noche' : 'Modo Día';
             });
 
             // Inicializar efectos
